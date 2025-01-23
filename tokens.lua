@@ -97,9 +97,9 @@ function getPayload(token)
   return true, payload
 end
 
---- Create password hash from password and secret key
---- @param password string
+--- Create hash from text and secret key
+--- @param text string
 --- @return string
-function createPasswordHash(password, secret)
-  return base64_encode(xor_encrypt(password, secret))
+function createHash(text, secret)
+  return base64_encode(xor_encrypt(text, secret))
 end
