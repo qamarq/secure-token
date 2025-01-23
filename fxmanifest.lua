@@ -10,4 +10,5 @@ server_scripts {
 server_exports {
 	'generateToken',
 	'validateToken',
+  'createHash'
 }
