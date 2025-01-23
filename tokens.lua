@@ -81,7 +81,7 @@ end
 
 --- Reading just payload from token
 ---@param token string
-function getPayload(token)
+function verifyToken(token)
   local parts = {}
   for part in string.gmatch(token, "[^%.]+") do
       table.insert(parts, part)

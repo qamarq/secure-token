@@ -24,7 +24,7 @@ print("Payload: " .. payload)
 local token = exports["secure-token"]:generateToken(payload, secret_key)
 print("generated token: " .. token)
 
-local is_valid, just_data = exports["secure-token"]:getPayload(token)
+local is_valid, just_data = exports["secure-token"]:verifyToken(token)
 if is_valid then
   print("Payload: " .. just_data)
 else
