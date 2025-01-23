@@ -96,3 +96,10 @@ function getPayload(token)
   local payload = base64_decode(encoded_payload)
   return true, payload
 end
+
+--- Create password hash from password and secret key
+--- @param password string
+--- @return string
+function createPasswordHash(password, secret)
+  return base64_encode(xor_encrypt(password, secret))
+end
