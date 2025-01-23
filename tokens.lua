@@ -1,4 +1,3 @@
--- Funkcja do kodowania w Base64
 local function base64_encode(data)
   local b = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
   return ((data:gsub('.', function(x)
@@ -13,7 +12,6 @@ local function base64_encode(data)
   end) .. ({ '', '==', '=' })[#data % 3 + 1])
 end
 
--- Funkcja do dekodowania Base64
 local function base64_decode(data)
   local b = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
   data = data:gsub('[^' .. b .. '=]', '')
@@ -30,7 +28,6 @@ local function base64_decode(data)
   end))
 end
 
--- Funkcja do prostego szyfrowania (XOR z kluczem)
 local function xor_encrypt(data, key)
   local encrypted = {}
   for i = 1, #data do
@@ -44,20 +41,15 @@ end
 ---@param payload string
 ---@param secret string
 function generateToken(payload, secret)
-  -- Zakładamy, że payload jest już stringiem JSON
   local header = '{"alg":"XOR256","type":"JWT"}'
 
-  -- Zakoduj nagłówek i payload
   local encoded_header = base64_encode(header)
   local encoded_payload = base64_encode(payload)
 
-  -- Zaszyfruj podpis (header + payload z użyciem XOR i klucza)
   local signature = xor_encrypt(encoded_header .. "." .. encoded_payload, secret)
 
-  -- Zakoduj podpis w Base64
   local encoded_signature = base64_encode(signature)
 
-  -- Połącz w finalny token
   return encoded_header .. "." .. encoded_payload .. "." .. encoded_signature
 end
 
@@ -76,16 +68,13 @@ function validateToken(token, secret)
 
   local encoded_header, encoded_payload, encoded_signature = parts[1], parts[2], parts[3]
 
-  -- Odkoduj podpis z Base64
   local signature = base64_decode(encoded_signature)
 
-  -- Sprawdź poprawność podpisu (zaszyfruj header + payload i porównaj)
   local expected_signature = xor_encrypt(encoded_header .. "." .. encoded_payload, secret)
   if signature ~= expected_signature then
       return false, "Nieprawidłowy podpis"
   end
 
-  -- Odkoduj payload
   local payload = base64_decode(encoded_payload)
   return true, payload
 end
@@ -104,7 +93,6 @@ function getPayload(token)
 
   local encoded_payload = parts[2]
 
-  -- Odkoduj payload
   local payload = base64_decode(encoded_payload)
   return true, payload
 end
