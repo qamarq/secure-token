@@ -40,10 +40,12 @@ local function xor_encrypt(data, key)
   return table.concat(encrypted)
 end
 
--- Funkcja generująca "JWT"
-local function generate_token(payload, secret)
+--- Generate token from payload and secret key
+---@param payload string
+---@param secret string
+function generateToken(payload, secret)
   -- Zakładamy, że payload jest już stringiem JSON
-  local header = '{"alg":"XOR256","typ":"JWT"}'
+  local header = '{"alg":"XOR256","type":"JWT"}'
 
   -- Zakoduj nagłówek i payload
   local encoded_header = base64_encode(header)
@@ -59,8 +61,10 @@ local function generate_token(payload, secret)
   return encoded_header .. "." .. encoded_payload .. "." .. encoded_signature
 end
 
--- Funkcja walidująca "JWT"
-local function validate_token(token, secret)
+--- Validate token with given secret key
+---@param token string
+---@param secret string
+function validateToken(token, secret)
   local parts = {}
   for part in string.gmatch(token, "[^%.]+") do
       table.insert(parts, part)
@@ -86,20 +90,21 @@ local function validate_token(token, secret)
   return true, payload
 end
 
--- Przykład użycia
-local secret_key = "tajny_klucz"
-local payload = '{"sub":"1234567890","name":"John Doe","iat":' .. os.time() .. '}'
-print("Payload: " .. payload)
+--- Reading just payload from token
+---@param token string
+function getPayload(token)
+  local parts = {}
+  for part in string.gmatch(token, "[^%.]+") do
+      table.insert(parts, part)
+  end
 
--- Generowanie tokena
-local token = generate_token(payload, secret_key)
-print("Wygenerowany token: " .. token)
+  if #parts ~= 3 then
+      return false, "Nieprawidłowy format tokena"
+  end
 
--- Walidacja tokena
-local is_valid, data_or_err = validate_token(token, secret_key)
-if is_valid then
-  print("Token jest prawidłowy!")
-  print("Payload tokena: " .. data_or_err)
-else
-  print("Błąd walidacji: " .. data_or_err)
+  local encoded_payload = parts[2]
+
+  -- Odkoduj payload
+  local payload = base64_decode(encoded_payload)
+  return true, payload
 end
